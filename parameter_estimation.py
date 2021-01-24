@@ -7,8 +7,25 @@ def main():
     fingerprint = io.imread('test.tif')
     window_size = 10
     orientations = get_orientation_map(fingerprint, window_size)
-    # print(np.degrees(orientations))
-    
+    # normalized = normalize_fingerprint(fingerprint)
+
+def normalize_fingerprint(fingerprint, M_0=100, var_0 = 100):
+    I = fingerprint
+    M = np.mean(I)
+    var = np.var(I)
+    # first case
+    mask_1 = I>M
+    value_1 = M_0+np.sqrt((var_0*((I-M)**2))/var)
+    G_1 = mask_1*value_1
+    # second case
+    mask_2 = I<=M
+    value_2 = M_0-np.sqrt((var_0*((I-M)**2))/var)
+    G_2 = mask_2*value_2
+
+    normalized_image = G_1 + G_2
+    return normalized_image
+
+
 def get_orientation_map(fingerprint, window_size):
     print(np.arctan(1))
     gradient_x = flt.sobel_h(fingerprint)
@@ -30,14 +47,14 @@ def get_orientation_map(fingerprint, window_size):
             orientation_map[i,j]=theta
 
     # plotting the orientation map
-    x_values = np.arange(0,(num_x)*window_size, window_size)
-    y_values = np.arange(0,(num_y)*window_size, window_size) 
-    x_grid, y_grid = np.meshgrid(x_values, y_values)
-    x_orientation, y_orientation = 10*np.cos(orientation_map), 10*np.sin(orientation_map)
-    plt.imshow(fingerprint,cmap='gray')
-    plt.quiver(x_grid, y_grid, x_orientation, y_orientation, color='red',scale=200, linewidth=10)
-    plt.show()
-    
+    # x_values = np.arange(0,(num_x)*window_size, window_size)
+    # y_values = np.arange(0,(num_y)*window_size, window_size) 
+    # x_grid, y_grid = np.meshgrid(x_values, y_values)
+    # x_orientation, y_orientation = 10*np.cos(orientation_map), 10*np.sin(orientation_map)
+    # plt.imshow(fingerprint,cmap='gray')
+    # plt.quiver(x_grid, y_grid, x_orientation, y_orientation, color='red',scale=200, linewidth=10)
+    # plt.show()
+
     return orientation_map
 
 if __name__ == '__main__':
